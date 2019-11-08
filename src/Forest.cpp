@@ -381,42 +381,44 @@ void Forest::writeImportanceFile() const {
     *verbose_out << "Saved variable importance to file " << filename << "." << std::endl;
 }
 
+void Forest::saveToFile(std::ofstream& outfile) const
+{
+    if (!outfile.good()) {
+      throw std::runtime_error("Could not write to output file.");
+    }
+    // Write dependent variable names
+    uint num_dependent_variables = dependent_variable_names.size();
+    if (num_dependent_variables >= 1) {
+      outfile.write((char*) &num_dependent_variables, sizeof(num_dependent_variables));
+      for (auto& var_name : dependent_variable_names) {
+        size_t length = var_name.size();
+        outfile.write((char*) &length, sizeof(length));
+        outfile.write((char*) var_name.c_str(), length * sizeof(char));
+      }
+    } else {
+      throw std::runtime_error("Missing dependent variable name.");
+    }
+    // Write num_trees
+    outfile.write((char*) &num_trees, sizeof(num_trees));
+    // Write is_ordered_variable
+    saveVector1D(data->getIsOrderedVariable(), outfile);
+    saveToFileInternal(outfile);
+    // Write tree data for each tree
+    for (auto& tree : trees) {
+      tree->appendToFile(outfile);
+    }
+}
+
 void Forest::saveToFile() const {
 
   // Open file for writing
   std::string filename = output_prefix + ".forest";
-  std::ofstream outfile;
-  outfile.open(filename, std::ios::binary);
-  if (!outfile.good()) {
-    throw std::runtime_error("Could not write to output file: " + filename + ".");
+  std::ofstream outfile {filename, std::ios::binary};
+  try {
+      saveToFile(outfile);
+  } catch (...) {
+      throw std::runtime_error("Could not write to output file: " + filename + ".");
   }
-
-  // Write dependent variable names
-  uint num_dependent_variables = dependent_variable_names.size();
-  if (num_dependent_variables >= 1) {
-    outfile.write((char*) &num_dependent_variables, sizeof(num_dependent_variables));
-    for (auto& var_name : dependent_variable_names) {
-      size_t length = var_name.size();
-      outfile.write((char*) &length, sizeof(length));
-      outfile.write((char*) var_name.c_str(), length * sizeof(char));
-    }
-  } else {
-    throw std::runtime_error("Missing dependent variable name.");
-  }
-
-  // Write num_trees
-  outfile.write((char*) &num_trees, sizeof(num_trees));
-
-  // Write is_ordered_variable
-  saveVector1D(data->getIsOrderedVariable(), outfile);
-
-  saveToFileInternal(outfile);
-
-  // Write tree data for each tree
-  for (auto& tree : trees) {
-    tree->appendToFile(outfile);
-  }
-
   // Close file
   outfile.close();
   if (verbose_out)

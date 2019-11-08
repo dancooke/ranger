@@ -71,6 +71,7 @@ public:
   void writeImportanceFile() const;
 
   // Save forest to file
+  void saveToFile(std::ofstream& outfile) const;
   void saveToFile() const;
 
   std::vector<std::vector<std::vector<size_t>>> getChildNodeIDs() {
