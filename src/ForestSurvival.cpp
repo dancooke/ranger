@@ -255,9 +255,6 @@ void ForestSurvival::writePredictionFile() const {
 
 void ForestSurvival::saveToFileInternal(std::ofstream& outfile) const {
 
-  // Write num_variables
-  outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));
-
   // Write treetype
   TreeType treetype = TREE_SURVIVAL;
   outfile.write((char*) &treetype, sizeof(treetype));
@@ -267,10 +264,6 @@ void ForestSurvival::saveToFileInternal(std::ofstream& outfile) const {
 }
 
 void ForestSurvival::loadFromFileInternal(std::ifstream& infile) {
-
-  // Read number of variables
-  size_t num_variables_saved;
-  infile.read((char*) &num_variables_saved, sizeof(num_variables_saved));
 
   // Read treetype
   TreeType treetype;
@@ -307,11 +300,6 @@ void ForestSurvival::loadFromFileInternal(std::ifstream& infile) {
 //    }
     for (size_t j = 0; j < terminal_nodes.size(); ++j) {
       chf[terminal_nodes[j]] = chf_vector[j];
-    }
-
-    // If dependent variable not in test data, throw error
-    if (num_variables_saved != num_independent_variables) {
-      throw std::runtime_error("Number of independent variables in data does not match with the loaded forest.");
     }
 
     // Create tree

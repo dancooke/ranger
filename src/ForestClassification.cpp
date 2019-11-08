@@ -269,10 +269,7 @@ void ForestClassification::writePredictionFile() const {
 }
 
 void ForestClassification::saveToFileInternal(std::ofstream& outfile) const {
-
-  // Write num_variables
-  outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));
-
+    
   // Write treetype
   TreeType treetype = TREE_CLASSIFICATION;
   outfile.write((char*) &treetype, sizeof(treetype));
@@ -282,10 +279,6 @@ void ForestClassification::saveToFileInternal(std::ofstream& outfile) const {
 }
 
 void ForestClassification::loadFromFileInternal(std::ifstream& infile) {
-
-  // Read number of variables
-  size_t num_variables_saved;
-  infile.read((char*) &num_variables_saved, sizeof(num_variables_saved));
 
   // Read treetype
   TreeType treetype;
@@ -306,11 +299,6 @@ void ForestClassification::loadFromFileInternal(std::ifstream& infile) {
     readVector1D(split_varIDs, infile);
     std::vector<double> split_values;
     readVector1D(split_values, infile);
-
-    // If dependent variable not in test data, throw error
-    if (num_variables_saved != num_independent_variables) {
-      throw std::runtime_error("Number of independent variables in data does not match with the loaded forest.");
-    }
 
     // Create tree
     trees.push_back(

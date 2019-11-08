@@ -85,6 +85,9 @@ void Forest::initCpp(std::string dependent_variable_name, MemoryMode memory_mode
 
   if (prediction_mode) {
     loadFromFile(load_forest_filename);
+    if (data->getNumCols() != num_independent_variables) {
+       throw std::runtime_error("Number of independent variables in data does not match with the loaded forest.");
+    }
   }
   // Set variables to be always considered for splitting
   if (!always_split_variable_names.empty()) {
@@ -849,30 +852,34 @@ void Forest::saveDependentVariablesToFile(std::ofstream& outfile) const
 }
 void Forest::saveMetaInformation(std::ofstream& outfile) const
 {
-    assert(outfile.good());
-    saveDependentVariablesToFile(outfile);
-    // Write num_trees
-    outfile.write((char*) &num_trees, sizeof(num_trees));
-    // Write is_ordered_variable
-    saveVector1D(data->getIsOrderedVariable(), outfile);
+  assert(outfile.good());
+  saveDependentVariablesToFile(outfile);
+  // Write num_trees
+  outfile.write((char*) &num_trees, sizeof(num_trees));
+  // Write is_ordered_variable
+  saveVector1D(data->getIsOrderedVariable(), outfile);
+  // Write num_variables
+  outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));
 }
 
 void Forest::loadMetaInformation(std::ifstream& infile)
 {
-    assert(infile.good());
-    loadDependentVariablesFromFile(infile);
-    // Read num_trees
-    infile.read((char*) &num_trees, sizeof(num_trees));
-    // Read is_ordered_variable
-    readVector1D(data->getIsOrderedVariable(), infile);
+  assert(infile.good());
+  loadDependentVariablesFromFile(infile);
+  // Read num_trees
+  infile.read((char*) &num_trees, sizeof(num_trees));
+  // Read is_ordered_variable
+  readVector1D(data->getIsOrderedVariable(), infile);
+  // Read number of variables
+  infile.read((char*) &num_independent_variables, sizeof(num_independent_variables));
 }
 
 void Forest::loadFromFile(std::ifstream& infile) {
-    if (!infile.good()) throw std::runtime_error("Could not read from input file.");
-    loadMetaInformation(infile);
-    loadFromFileInternal(infile);
-    // Create thread ranges
-    equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
+  if (!infile.good()) throw std::runtime_error("Could not read from input file.");
+  loadMetaInformation(infile);
+  loadFromFileInternal(infile);
+  // Create thread ranges
+  equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
 }
 
 void Forest::loadFromFile(std::string filename) {
