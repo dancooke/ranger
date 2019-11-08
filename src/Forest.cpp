@@ -386,22 +386,7 @@ void Forest::saveToFile(std::ofstream& outfile) const
     if (!outfile.good()) {
       throw std::runtime_error("Could not write to output file.");
     }
-    // Write dependent variable names
-    uint num_dependent_variables = dependent_variable_names.size();
-    if (num_dependent_variables >= 1) {
-      outfile.write((char*) &num_dependent_variables, sizeof(num_dependent_variables));
-      for (auto& var_name : dependent_variable_names) {
-        size_t length = var_name.size();
-        outfile.write((char*) &length, sizeof(length));
-        outfile.write((char*) var_name.c_str(), length * sizeof(char));
-      }
-    } else {
-      throw std::runtime_error("Missing dependent variable name.");
-    }
-    // Write num_trees
-    outfile.write((char*) &num_trees, sizeof(num_trees));
-    // Write is_ordered_variable
-    saveVector1D(data->getIsOrderedVariable(), outfile);
+    saveMetaInformation(outfile);
     saveToFileInternal(outfile);
     // Write tree data for each tree
     for (auto& tree : trees) {
@@ -847,39 +832,62 @@ void Forest::computeTreePermutationImportanceInThread(uint thread_idx, std::vect
 #endif
 
 // #nocov start
+void Forest::saveMetaInformation(std::ofstream& outfile) const
+{
+    assert(outfile.good());
+    // Write dependent variable names
+    uint num_dependent_variables = dependent_variable_names.size();
+    if (num_dependent_variables >= 1) {
+      outfile.write((char*) &num_dependent_variables, sizeof(num_dependent_variables));
+      for (auto& var_name : dependent_variable_names) {
+        size_t length = var_name.size();
+        outfile.write((char*) &length, sizeof(length));
+        outfile.write((char*) var_name.c_str(), length * sizeof(char));
+      }
+    } else {
+      throw std::runtime_error("Missing dependent variable name.");
+    }
+    // Write num_trees
+    outfile.write((char*) &num_trees, sizeof(num_trees));
+    // Write is_ordered_variable
+    saveVector1D(data->getIsOrderedVariable(), outfile);
+}
+
+void Forest::loadMetaInformation(std::ifstream& infile)
+{
+    assert(infile.good());
+    // Skip dependent variable names (already read)
+    uint num_dependent_variables;
+    infile.read((char*) &num_dependent_variables, sizeof(num_dependent_variables));
+    for (size_t i = 0; i < num_dependent_variables; ++i) {
+      size_t length;
+      infile.read((char*) &length, sizeof(size_t));
+      infile.ignore(length);
+    }
+    // Read num_trees
+    infile.read((char*) &num_trees, sizeof(num_trees));
+    // Read is_ordered_variable
+    readVector1D(data->getIsOrderedVariable(), infile);
+}
+
+void Forest::loadFromFile(std::ifstream& infile) {
+    if (!infile.good()) throw std::runtime_error("Could not read from input file.");
+    loadMetaInformation(infile);
+    loadFromFileInternal(infile);
+    // Create thread ranges
+    equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
+}
+
 void Forest::loadFromFile(std::string filename) {
   if (verbose_out)
     *verbose_out << "Loading forest from file " << filename << "." << std::endl;
-
   // Open file for reading
-  std::ifstream infile;
-  infile.open(filename, std::ios::binary);
-  if (!infile.good()) {
-    throw std::runtime_error("Could not read from input file: " + filename + ".");
-  }
-
-  // Skip dependent variable names (already read)
-  uint num_dependent_variables;
-  infile.read((char*) &num_dependent_variables, sizeof(num_dependent_variables));
-  for (size_t i = 0; i < num_dependent_variables; ++i) {
-    size_t length;
-    infile.read((char*) &length, sizeof(size_t));
-    infile.ignore(length);
-  }
-
-  // Read num_trees
-  infile.read((char*) &num_trees, sizeof(num_trees));
-
-  // Read is_ordered_variable
-  readVector1D(data->getIsOrderedVariable(), infile);
-
-  // Read tree data. This is different for tree types -> virtual function
-  loadFromFileInternal(infile);
-
-  infile.close();
-
-  // Create thread ranges
-  equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
+  std::ifstream infile {filename, std::ios::binary};
+  try {
+      loadFromFile(infile);
+  } catch (...) {
+      throw std::runtime_error("Could not read from input file: " + filename + ".");
+  }  
 }
 
 void Forest::loadDependentVariableNamesFromFile(std::string filename) {

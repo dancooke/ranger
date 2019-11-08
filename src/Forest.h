@@ -154,6 +154,7 @@ protected:
       std::vector<double>& variance, std::vector<double>& importance_casewise);
 
   // Load forest from file
+  void loadFromFile(std::ifstream& infile);
   void loadFromFile(std::string filename);
   void loadDependentVariableNamesFromFile(std::string filename);
 
@@ -254,6 +255,9 @@ private:
   virtual void writePredictionFile() const = 0;
   virtual void saveToFileInternal(std::ofstream& outfile) const = 0;
   virtual void loadFromFileInternal(std::ifstream& infile) = 0;
+  
+  void saveMetaInformation(std::ofstream& outfile) const; 
+  void loadMetaInformation(std::ifstream& infile);
 };
 
 } // namespace ranger
