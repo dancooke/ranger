@@ -181,7 +181,7 @@ void ForestSurvival::computePredictionErrorInternal() {
 }
 
 // #nocov start
-void ForestSurvival::writeOutputInternal() {
+void ForestSurvival::writeOutputInternal() const {
   if (verbose_out) {
     *verbose_out << "Tree type:                         " << "Survival" << std::endl;
     if (dependent_variable_names.size() >= 2) {
@@ -190,7 +190,7 @@ void ForestSurvival::writeOutputInternal() {
   }
 }
 
-void ForestSurvival::writeConfusionFile() {
+void ForestSurvival::writeConfusionFile() const {
 
   // Open confusion file for writing
   std::string filename = output_prefix + ".confusion";
@@ -209,7 +209,7 @@ void ForestSurvival::writeConfusionFile() {
 
 }
 
-void ForestSurvival::writePredictionFile() {
+void ForestSurvival::writePredictionFile() const {
 
   // Open prediction file for writing
   std::string filename = output_prefix + ".prediction";
@@ -253,7 +253,7 @@ void ForestSurvival::writePredictionFile() {
     *verbose_out << "Saved predictions to file " << filename << "." << std::endl;
 }
 
-void ForestSurvival::saveToFileInternal(std::ofstream& outfile) {
+void ForestSurvival::saveToFileInternal(std::ofstream& outfile) const {
 
   // Write num_variables
   outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));

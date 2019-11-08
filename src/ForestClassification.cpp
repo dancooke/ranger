@@ -182,13 +182,13 @@ void ForestClassification::computePredictionErrorInternal() {
 }
 
 // #nocov start
-void ForestClassification::writeOutputInternal() {
+void ForestClassification::writeOutputInternal() const {
   if (verbose_out) {
     *verbose_out << "Tree type:                         " << "Classification" << std::endl;
   }
 }
 
-void ForestClassification::writeConfusionFile() {
+void ForestClassification::writeConfusionFile() const {
 
   // Open confusion file for writing
   std::string filename = output_prefix + ".confusion";
@@ -210,7 +210,7 @@ void ForestClassification::writeConfusionFile() {
   for (auto& predicted_value : class_values) {
     outfile << "predicted " << predicted_value << "     ";
     for (auto& real_value : class_values) {
-      size_t value = classification_table[std::make_pair(real_value, predicted_value)];
+      size_t value = classification_table.at(std::make_pair(real_value, predicted_value));
       outfile << value;
       if (value < 10) {
         outfile << "     ";
@@ -232,7 +232,7 @@ void ForestClassification::writeConfusionFile() {
     *verbose_out << "Saved confusion matrix to file " << filename << "." << std::endl;
 }
 
-void ForestClassification::writePredictionFile() {
+void ForestClassification::writePredictionFile() const {
 
   // Open prediction file for writing
   std::string filename = output_prefix + ".prediction";
@@ -268,7 +268,7 @@ void ForestClassification::writePredictionFile() {
     *verbose_out << "Saved predictions to file " << filename << "." << std::endl;
 }
 
-void ForestClassification::saveToFileInternal(std::ofstream& outfile) {
+void ForestClassification::saveToFileInternal(std::ofstream& outfile) const {
 
   // Write num_variables
   outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));

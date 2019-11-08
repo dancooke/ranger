@@ -142,13 +142,13 @@ void ForestRegression::computePredictionErrorInternal() {
 }
 
 // #nocov start
-void ForestRegression::writeOutputInternal() {
+void ForestRegression::writeOutputInternal() const {
   if (verbose_out) {
     *verbose_out << "Tree type:                         " << "Regression" << std::endl;
   }
 }
 
-void ForestRegression::writeConfusionFile() {
+void ForestRegression::writeConfusionFile() const {
 
 // Open confusion file for writing
   std::string filename = output_prefix + ".confusion";
@@ -166,7 +166,7 @@ void ForestRegression::writeConfusionFile() {
     *verbose_out << "Saved prediction error to file " << filename << "." << std::endl;
 }
 
-void ForestRegression::writePredictionFile() {
+void ForestRegression::writePredictionFile() const {
 
 // Open prediction file for writing
   std::string filename = output_prefix + ".prediction";
@@ -202,7 +202,7 @@ void ForestRegression::writePredictionFile() {
     *verbose_out << "Saved predictions to file " << filename << "." << std::endl;
 }
 
-void ForestRegression::saveToFileInternal(std::ofstream& outfile) {
+void ForestRegression::saveToFileInternal(std::ofstream& outfile) const {
 
 // Write num_variables
   outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));

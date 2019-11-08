@@ -195,13 +195,13 @@ void ForestProbability::computePredictionErrorInternal() {
 }
 
 // #nocov start
-void ForestProbability::writeOutputInternal() {
+void ForestProbability::writeOutputInternal() const {
   if (verbose_out) {
     *verbose_out << "Tree type:                         " << "Probability estimation" << std::endl;
   }
 }
 
-void ForestProbability::writeConfusionFile() {
+void ForestProbability::writeConfusionFile() const {
 
 // Open confusion file for writing
   std::string filename = output_prefix + ".confusion";
@@ -219,7 +219,7 @@ void ForestProbability::writeConfusionFile() {
     *verbose_out << "Saved prediction error to file " << filename << "." << std::endl;
 }
 
-void ForestProbability::writePredictionFile() {
+void ForestProbability::writePredictionFile() const {
 
   // Open prediction file for writing
   std::string filename = output_prefix + ".prediction";
@@ -262,7 +262,7 @@ void ForestProbability::writePredictionFile() {
     *verbose_out << "Saved predictions to file " << filename << "." << std::endl;
 }
 
-void ForestProbability::saveToFileInternal(std::ofstream& outfile) {
+void ForestProbability::saveToFileInternal(std::ofstream& outfile) const {
 
 // Write num_variables
   outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));

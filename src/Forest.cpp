@@ -341,7 +341,7 @@ void Forest::writeOutput() {
   }
 }
 
-void Forest::writeImportanceFile() {
+void Forest::writeImportanceFile() const {
 
   // Open importance file for writing
   std::string filename = output_prefix + ".importance";
@@ -381,7 +381,7 @@ void Forest::writeImportanceFile() {
     *verbose_out << "Saved variable importance to file " << filename << "." << std::endl;
 }
 
-void Forest::saveToFile() {
+void Forest::saveToFile() const {
 
   // Open file for writing
   std::string filename = output_prefix + ".forest";

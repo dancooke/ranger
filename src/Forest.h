@@ -69,14 +69,14 @@ public:
 
   // Write results to output files
   void writeOutput();
-  virtual void writeOutputInternal() = 0;
-  virtual void writeConfusionFile() = 0;
-  virtual void writePredictionFile() = 0;
-  void writeImportanceFile();
+  virtual void writeOutputInternal() const = 0;
+  virtual void writeConfusionFile() const = 0;
+  virtual void writePredictionFile() const = 0;
+  void writeImportanceFile() const;
 
   // Save forest to file
-  void saveToFile();
-  virtual void saveToFileInternal(std::ofstream& outfile) = 0;
+  void saveToFile() const;
+  virtual void saveToFileInternal(std::ofstream& outfile) const = 0;
 
   std::vector<std::vector<std::vector<size_t>>> getChildNodeIDs() {
     std::vector<std::vector<std::vector<size_t>>> result;

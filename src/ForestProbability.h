@@ -52,10 +52,10 @@ protected:
   void allocatePredictMemory() override;
   void predictInternal(size_t sample_idx) override;
   void computePredictionErrorInternal() override;
-  void writeOutputInternal() override;
-  void writeConfusionFile() override;
-  void writePredictionFile() override;
-  void saveToFileInternal(std::ofstream& outfile) override;
+  void writeOutputInternal() const override;
+  void writeConfusionFile() const override;
+  void writePredictionFile() const override;
+  void saveToFileInternal(std::ofstream& outfile) const override;
   void loadFromFileInternal(std::ifstream& infile) override;
 
   // Classes of the dependent variable and classIDs for responses
