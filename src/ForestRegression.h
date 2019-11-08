@@ -45,7 +45,6 @@ private:
   void saveToFileInternal(std::ofstream& outfile) const override;
   void loadFromFileInternal(std::ifstream& infile) override;
 
-private:
   double getTreePrediction(size_t tree_idx, size_t sample_idx) const;
   size_t getTreePredictionTerminalNodeID(size_t tree_idx, size_t sample_idx) const;
 };

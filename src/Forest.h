@@ -62,21 +62,16 @@ public:
       bool memory_saving_splitting, SplitRule splitrule, bool predict_all, std::vector<double>& sample_fraction,
       double alpha, double minprop, bool holdout, PredictionType prediction_type, uint num_random_splits,
       bool order_snps, uint max_depth);
-  virtual void initInternal() = 0;
 
   // Grow or predict
   void run(bool verbose, bool compute_oob_error);
 
   // Write results to output files
   void writeOutput();
-  virtual void writeOutputInternal() const = 0;
-  virtual void writeConfusionFile() const = 0;
-  virtual void writePredictionFile() const = 0;
   void writeImportanceFile() const;
 
   // Save forest to file
   void saveToFile() const;
-  virtual void saveToFileInternal(std::ofstream& outfile) const = 0;
 
   std::vector<std::vector<std::vector<size_t>>> getChildNodeIDs() {
     std::vector<std::vector<std::vector<size_t>>> result;
@@ -142,15 +137,11 @@ public:
 
 protected:
   void grow();
-  virtual void growInternal() = 0;
 
   // Predict using existing tree from file and data as prediction data
   void predict();
-  virtual void allocatePredictMemory() = 0;
-  virtual void predictInternal(size_t sample_idx) = 0;
 
   void computePredictionError();
-  virtual void computePredictionErrorInternal() = 0;
 
   void computePermutationImportance();
 
@@ -163,7 +154,6 @@ protected:
 
   // Load forest from file
   void loadFromFile(std::string filename);
-  virtual void loadFromFileInternal(std::ifstream& infile) = 0;
   void loadDependentVariableNamesFromFile(std::string filename);
 
   // Load data from file
@@ -251,6 +241,18 @@ protected:
   size_t aborted_threads;
   bool aborted;
 #endif
+  
+private:
+  virtual void initInternal() = 0;
+  virtual void growInternal() = 0;
+  virtual void allocatePredictMemory() = 0;
+  virtual void predictInternal(size_t sample_idx) = 0;
+  virtual void computePredictionErrorInternal() = 0;
+  virtual void writeOutputInternal() const = 0;
+  virtual void writeConfusionFile() const = 0;
+  virtual void writePredictionFile() const = 0;
+  virtual void saveToFileInternal(std::ofstream& outfile) const = 0;
+  virtual void loadFromFileInternal(std::ifstream& infile) = 0;
 };
 
 } // namespace ranger

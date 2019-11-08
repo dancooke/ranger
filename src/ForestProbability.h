@@ -47,6 +47,14 @@ public:
   }
 
 protected:
+  // Classes of the dependent variable and classIDs for responses
+  std::vector<double> class_values;
+  std::vector<uint> response_classIDs;
+  std::vector<std::vector<size_t>> sampleIDs_per_class;
+
+  // Splitting weights
+  std::vector<double> class_weights;
+  
   void initInternal() override;
   void growInternal() override;
   void allocatePredictMemory() override;
@@ -58,15 +66,6 @@ protected:
   void saveToFileInternal(std::ofstream& outfile) const override;
   void loadFromFileInternal(std::ifstream& infile) override;
 
-  // Classes of the dependent variable and classIDs for responses
-  std::vector<double> class_values;
-  std::vector<uint> response_classIDs;
-  std::vector<std::vector<size_t>> sampleIDs_per_class;
-
-  // Splitting weights
-  std::vector<double> class_weights;
-
-private:
   const std::vector<double>& getTreePrediction(size_t tree_idx, size_t sample_idx) const;
   size_t getTreePredictionTerminalNodeID(size_t tree_idx, size_t sample_idx) const;
 };
