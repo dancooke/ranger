@@ -153,11 +153,6 @@ protected:
   void computeTreePermutationImportanceInThread(uint thread_idx, std::vector<double>& importance,
       std::vector<double>& variance, std::vector<double>& importance_casewise);
 
-  // Load forest from file
-  void loadFromFile(std::ifstream& infile);
-  void loadFromFile(std::string filename);
-  void loadDependentVariableNamesFromFile(std::string filename);
-
   // Load data from file
   std::unique_ptr<Data> loadDataFromFile(const std::string& data_path);
 
@@ -256,6 +251,11 @@ private:
   virtual void saveToFileInternal(std::ofstream& outfile) const = 0;
   virtual void loadFromFileInternal(std::ifstream& infile) = 0;
   
+  void loadFromFile(std::ifstream& infile);
+  void loadFromFile(std::string filename);
+  void loadDependentVariablesFromFile(std::ifstream& infile);
+  void loadDependentVariableNamesFromFile(std::string filename);
+  void saveDependentVariablesToFile(std::ofstream& outfile) const;
   void saveMetaInformation(std::ofstream& outfile) const; 
   void loadMetaInformation(std::ifstream& infile);
 };
