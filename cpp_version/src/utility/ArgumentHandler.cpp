@@ -16,6 +16,7 @@
 #include "ArgumentHandler.h"
 #include "version.h"
 #include "utility.h"
+#include "../Forest/Forest.h"
 
 namespace ranger {
 
@@ -445,21 +446,14 @@ void ArgumentHandler::checkArguments() {
 
   // Get treetype for prediction
   if (!predict.empty()) {
-    std::ifstream infile;
-    infile.open(predict, std::ios::binary);
+    std::ifstream infile {predict, std::ios::binary};
     if (!infile.good()) {
       throw std::runtime_error("Could not read from input file: " + predict + ".");
     }
-
-    // Do not read num_variables, num_trees and is_ordered_variable
-    infile.seekg(sizeof(size_t));
-    size_t length;
-    infile.read((char*) &length, sizeof(length));
-    infile.seekg(4 * sizeof(size_t) + length * sizeof(bool));
-
+    Forest::MetaInfo meta {};
+    read_meta(infile, meta);
     // Get treetype
     infile.read((char*) &treetype, sizeof(treetype));
-    infile.close();
   }
 
   if (predict.empty() && predall) {

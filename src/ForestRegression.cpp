@@ -142,13 +142,13 @@ void ForestRegression::computePredictionErrorInternal() {
 }
 
 // #nocov start
-void ForestRegression::writeOutputInternal() {
+void ForestRegression::writeOutputInternal() const {
   if (verbose_out) {
     *verbose_out << "Tree type:                         " << "Regression" << std::endl;
   }
 }
 
-void ForestRegression::writeConfusionFile() {
+void ForestRegression::writeConfusionFile() const {
 
 // Open confusion file for writing
   std::string filename = output_prefix + ".confusion";
@@ -166,7 +166,7 @@ void ForestRegression::writeConfusionFile() {
     *verbose_out << "Saved prediction error to file " << filename << "." << std::endl;
 }
 
-void ForestRegression::writePredictionFile() {
+void ForestRegression::writePredictionFile() const {
 
 // Open prediction file for writing
   std::string filename = output_prefix + ".prediction";
@@ -202,10 +202,7 @@ void ForestRegression::writePredictionFile() {
     *verbose_out << "Saved predictions to file " << filename << "." << std::endl;
 }
 
-void ForestRegression::saveToFileInternal(std::ofstream& outfile) {
-
-// Write num_variables
-  outfile.write((char*) &num_independent_variables, sizeof(num_independent_variables));
+void ForestRegression::saveToFileInternal(std::ofstream& outfile) const {
 
 // Write treetype
   TreeType treetype = TREE_REGRESSION;
@@ -213,10 +210,6 @@ void ForestRegression::saveToFileInternal(std::ofstream& outfile) {
 }
 
 void ForestRegression::loadFromFileInternal(std::ifstream& infile) {
-
-// Read number of variables
-  size_t num_variables_saved;
-  infile.read((char*) &num_variables_saved, sizeof(num_variables_saved));
 
 // Read treetype
   TreeType treetype;
@@ -234,11 +227,6 @@ void ForestRegression::loadFromFileInternal(std::ifstream& infile) {
     readVector1D(split_varIDs, infile);
     std::vector<double> split_values;
     readVector1D(split_values, infile);
-
-    // If dependent variable not in test data, throw error
-    if (num_variables_saved != num_independent_variables) {
-      throw std::runtime_error("Number of independent variables in data does not match with the loaded forest.");
-    }
 
     // Create tree
     trees.push_back(make_unique<TreeRegression>(child_nodeIDs, split_varIDs, split_values));
