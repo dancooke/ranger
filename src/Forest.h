@@ -32,6 +32,13 @@ namespace ranger {
 
 class Forest {
 public:
+  struct MetaInfo
+  {
+    std::vector<std::string> dependent_variable_names, independent_variable_names;
+    size_t num_trees;
+    std::vector<bool> ordered_variable_indicators;
+  };
+  
   Forest();
 
   Forest(const Forest&) = delete;
@@ -255,10 +262,12 @@ private:
   void loadFromFile(std::string filename);
   void loadDependentVariablesFromFile(std::ifstream& infile);
   void loadDependentVariableNamesFromFile(std::string filename);
-  void saveDependentVariablesToFile(std::ofstream& outfile) const;
   void saveMetaInformation(std::ofstream& outfile) const; 
   void loadMetaInformation(std::ifstream& infile);
 };
+
+void write_meta(std::ofstream& outfile, const Forest::MetaInfo& meta_info);
+void read_meta(std::ifstream& infile, Forest::MetaInfo& meta_info);
 
 } // namespace ranger
 
